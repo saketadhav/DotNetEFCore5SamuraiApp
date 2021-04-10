@@ -2,7 +2,7 @@
 
 namespace SamuraiApp.Data.Migrations
 {
-    public partial class init_migration_1 : Migration
+    public partial class onetomany : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

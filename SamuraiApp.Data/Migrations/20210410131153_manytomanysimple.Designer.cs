@@ -9,8 +9,8 @@ using SamuraiApp.Data;
 namespace SamuraiApp.Data.Migrations
 {
     [DbContext(typeof(SamuraiContext))]
-    [Migration("20210408203859_init_migration_1")]
-    partial class init_migration_1
+    [Migration("20210410131153_manytomanysimple")]
+    partial class manytomanysimple
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,6 +19,36 @@ namespace SamuraiApp.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.5")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("BattleSamurai", b =>
+                {
+                    b.Property<int>("BattlesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SamuraisId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BattlesId", "SamuraisId");
+
+                    b.HasIndex("SamuraisId");
+
+                    b.ToTable("BattleSamurai");
+                });
+
+            modelBuilder.Entity("SamuraiApp.Domain.Battle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Battles");
+                });
 
             modelBuilder.Entity("SamuraiApp.Domain.Quote", b =>
                 {
@@ -53,6 +83,21 @@ namespace SamuraiApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Samurais");
+                });
+
+            modelBuilder.Entity("BattleSamurai", b =>
+                {
+                    b.HasOne("SamuraiApp.Domain.Battle", null)
+                        .WithMany()
+                        .HasForeignKey("BattlesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SamuraiApp.Domain.Samurai", null)
+                        .WithMany()
+                        .HasForeignKey("SamuraisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SamuraiApp.Domain.Quote", b =>

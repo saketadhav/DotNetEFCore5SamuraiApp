@@ -20,10 +20,12 @@ In console, select default project as SamuraiApp.Data
 
 get-help entityframework
 
+get-migration                                      // used to get a list of all the migrations with respective status
+
 Add-Migrations & Update-database are most commonly used.
 
 add-migration init_migration_1                     //init_migration_1 is name of migration, you can put whatever you want
-
+      
 update-database                                    //update-database -verbose
 
 --for development database => update-database
@@ -35,4 +37,12 @@ scaffold-dbcontext -provider Microsoft.EntityFrameworkCore.SqlServer -connection
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
+To visualize the the models and relationships created by entity framework, use followinf tool :-
 
+EF Core Power Tools
+
+This is a visual studio extension which runs on DGML editor
+
+Visual Studio -> Extensions -> Manage Extensions.
+Search 'EF Core Power Tools' and click download.
+Then, right click on SamuraiApp.Data project -> EF Core Power Tools -> Add DbContext Model Diagram
