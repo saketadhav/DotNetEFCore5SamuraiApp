@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SamuraiApp.Domain;
+using System;
 
 namespace SamuraiApp.Data
 {
@@ -12,7 +14,13 @@ namespace SamuraiApp.Data
         //This OnConfiguring methos is used here only for demo purpose. We shall inject this info from config file later on.
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiAppData");
+            optionsBuilder
+                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiAppData")
+                //For logging
+                //.LogTo(Console.WriteLine);
+                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+                //To Log sensitive data i.e. paramets, etc
+                .EnableSensitiveDataLogging();
         }
 
         //EF core has already generated class BattleSamurai on it's own for many to many relationship.
