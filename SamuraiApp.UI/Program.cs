@@ -23,6 +23,8 @@ namespace SamuraiApp.UI
             //DBContext => database, DBSet => table
 
             _context.Database.EnsureCreated();
+
+            //Simple Queries
             GetSamurais("Before Add:");
             AddSamuraisByName("Shimada", "Okamoto", "Kikuchio", "Hayashida");
             GetSamurais("After Add:");
@@ -33,13 +35,35 @@ namespace SamuraiApp.UI
             MultipleDatabaseOperations();
             RetrieveAndDelete();
 
+            //Disconnected context
             QueryAndUpdateBattle_Disconnected();
 
+            //Avoid / Disable tracking mechanism
             GetResultsYetAvoidTracking();
+
+            //Adding related data
+            InsertNewSamuraiWithAQuote();
+            InsertNewSamuraiWithManyQuotes();
+            AddQuoteToExistingSamuraiBeingTracked();
+            AddQuoteToExistingSamuraiNotTracked(2);
+            Simpler_AddQuoteToExistingSamuraiNotTracked(2);
+
+            //Getting / Fetching : Methods to load related data: Eager loading, query projections, explicit loading, lazy loading
+            EagerLoadSamuraiWithQuotes();
+            ProjectSomeProperties();
+            ExplicitLoadQuotes();
+            LazyLoadQuotes();
+
+            //Filtering with related data : apply filters using conditions on related data, without loading related data
+            FilteringWithRelatedData();
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
+
+        #region Simple Queries
+
+        /// Simple Queries ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private static void AddSamuraisByName(params string[] names)
         {
@@ -120,8 +144,11 @@ namespace SamuraiApp.UI
             _context.SaveChanges();
         }
 
+        #endregion
 
+        #region Disconnected context
 
+        /// Disconnected context ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private static void QueryAndUpdateBattle_Disconnected()
         {
@@ -144,7 +171,11 @@ namespace SamuraiApp.UI
             }
         }
 
+        #endregion
 
+        #region Avoid / Disable tracking mechanism
+
+        /// Avoid / Disable tracking mechanism ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static void GetResultsYetAvoidTracking()
         {
@@ -163,6 +194,174 @@ namespace SamuraiApp.UI
             //Refer SamuraiContextNoTracking()
         }
 
+        #endregion
 
+        #region Adding related data
+
+        /// Adding related data ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void InsertNewSamuraiWithAQuote()
+        {
+            var samurai = new Samurai
+            {
+                Name = "Kembai Shimada",
+                Quotes = new List<Quote>{ new Quote { Text = "I've come to save you"} }
+            };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void InsertNewSamuraiWithManyQuotes()
+        {
+            var samurai = new Samurai
+            {
+                Name = "Kyuzo",
+                Quotes = new List<Quote> { 
+                    new Quote { Text = "Watch out for my sharp sword!" },
+                    new Quote { Text = "I told you to watch out for my sharp sword! Oh well." }
+                }
+            };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void AddQuoteToExistingSamuraiBeingTracked()
+        {
+            var samurai = _context.Samurais.FirstOrDefault();
+            samurai.Quotes.Add(new Quote { Text = "I bet you're happy that I saved you!" });
+            _context.SaveChanges();
+        }
+
+        private static void AddQuoteToExistingSamuraiNotTracked(int samuraiId)
+        {
+            var samurai = _context.Samurais.Find(samuraiId);
+            samurai.Quotes.Add(new Quote { Text = "Now that I saved you, will you feed me dinner?" });
+            using (var newContext = new SamuraiContext())
+            {
+                newContext.Samurais.Update(samurai);
+                newContext.SaveChanges();
+            }
+        }
+
+        private static void Simpler_AddQuoteToExistingSamuraiNotTracked(int samuraiId)
+        {
+            var quote = new Quote { Text = "Thanks for the dinner.", SamuraiId = samuraiId };
+            using var newContext = new SamuraiContext();
+            newContext.Qoutes.Add(quote);
+            newContext.SaveChanges();
+        }
+
+        #endregion
+
+        #region Methods to load related data
+
+        /// Methods to load related data ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //1. EagerLoading => Include related objects in query
+        //2. Query Projections => Define the shape of query results
+        //3. Explicit Loading => Loading related data for objects which are already in memory
+        //4. Lazy Loading => on-the-fly retrieval of related data
+
+
+        private static void EagerLoadSamuraiWithQuotes()
+        {
+            //Includes -> creates a left join query : Samurai left join Quotes
+            var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+
+            //AsSplitQuery -> query broken up into multiple queries : use inner join
+            var splitQuery = _context.Samurais.AsSplitQuery().Include(s => s.Quotes).ToList();
+
+            //To filter or sort (order by) results while querying with eager loading : new fewature of ef core added in 2020
+            var filteredInclude1 = _context.Samurais.Include(s => s.Quotes.Where(q => q.Text.Contains("Thanks"))).ToList();
+
+            var filteredInclude2 = _context.Samurais.Where(s => s.Name.Contains("Sampson")).Include(s => s.Quotes).FirstOrDefault();
+        }
+
+        private static void ProjectSomeProperties()
+        {
+            //Project to 'Anonymous' type
+            var somePropertiesToAnonymousType = _context.Samurais.Select(s => new { s.Id, s.Name }).ToList();
+
+            //Project to some known / defined type
+            var somePropertiesToDefinedType = _context.Samurais.Select(s => new IdAndName(s.Id, s.Name)).ToList();
+
+            //Inclue one more property (quotes) while projecting to 'Anonymous' type
+            var somePropertiesWithQuotes = _context.Samurais.Select(s => new { s.Id, s.Name, s.Quotes }).ToList();
+
+            //Select aggregate of related data
+            var somePropertiesWithQuotesAggregate = _context.Samurais.Select(s => new { s.Id, s.Name, NumberOfQuotes = s.Quotes.Count }).ToList();
+
+            //Filter related data
+            var somePropertiesWithQuotesFiltered = _context.Samurais.Select(s => new { s.Id, s.Name, HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy")) }).ToList();
+
+            //Full entity objects with filtered related data
+            var allSamuraisWithQuotesFiltered = _context.Samurais.Select(s => new { Samurai = s, HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy")) }).ToList();
+
+            //In quick watch, you can see the change tracker entries in _context.ChangeTracker.Entries, results
+        }
+
+            //Temporary class to project qeury result into this type
+            public class IdAndName
+            {
+                public IdAndName(int id, string name)
+                {
+                    Id = id;
+                    Name = name;
+                }
+
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+
+        private static void ExplicitLoadQuotes()
+        {
+            //With 'samurai' object already in memory
+            //_context.Entry(samurai).Collection(s => s.Quotes).Load();  -- DbContext.Entry().Collection().Load()   -- For adding info of collection property
+            //_context.Entry(samurai).Reference(s => s.Horse).Load();     -- DbContext.Entry().Reference().Load()   -- For adding info of reference property
+
+            //Make sure there is a horse in DB, then clear the context's change tracker
+            _context.Set<Horse>().Add(new Horse { SamuraiId = 1, Name = "Mr. Ed" });
+            _context.SaveChanges();
+            _context.ChangeTracker.Clear();
+            //---
+
+            var samurai = _context.Samurais.Find(1);
+
+            _context.Entry(samurai).Collection(s => s.Quotes).Load();
+
+            _context.Entry(samurai).Reference(s => s.Horse).Load();
+
+        }
+
+        private static void LazyLoadQuotes()
+        {
+            //Lazy loading is turned OFF by default.
+            //You have to explicitly mention Lazy Loading to enable it.
+            //For enabling lazy loading
+                //1. Every navigation property in every entity must be virtual
+                //2. Need Microsoft.EntityFramework.Proxies package
+                //3. OnConfiguring in dbcontext class : optionsBuilder.UseLazyLoadingProxies()
+
+        }
+
+        #endregion
+
+        #region Filtering with related data : apply filters using conditions on related data, without loading related data
+
+        private static void FilteringWithRelatedData()
+        {
+            var samurais = _context.Samurais.Where(s => s.Quotes.Any(q => q.Text.Contains("happy"))).ToList();
+        }
+
+        #endregion
+
+        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 }
