@@ -11,7 +11,7 @@ namespace SamuraiApp.UI
     {
         private static SamuraiContext _context = new SamuraiContext();
 
-        private static SamuraiContext _contextNT = new SamuraiContextNoTracking();
+        //private static SamuraiContext _contextNT = new SamuraiContextNoTracking();
         //You can use _contextNT for non tracking queries now.
 
         static void Main(string[] args)
@@ -45,8 +45,9 @@ namespace SamuraiApp.UI
             InsertNewSamuraiWithAQuote();
             InsertNewSamuraiWithManyQuotes();
             AddQuoteToExistingSamuraiBeingTracked();
-            AddQuoteToExistingSamuraiNotTracked(2);
-            Simpler_AddQuoteToExistingSamuraiNotTracked(2);
+            AddQuoteToExistingSamuraiNotTracked(6);
+            Simpler_AddQuoteToExistingSamuraiNotTracked(6);
+            AddBattles();
 
             //Getting / Fetching : Methods to load related data: Eager loading, query projections, explicit loading, lazy loading
             EagerLoadSamuraiWithQuotes();
@@ -251,6 +252,18 @@ namespace SamuraiApp.UI
             newContext.SaveChanges();
         }
 
+        private static void AddBattles()
+        {
+            List<Battle> newBattles = new List<Battle>();
+            newBattles.Add(new Battle { Name = "Battle of Shanghai" });
+            newBattles.Add(new Battle { Name = "Battle of Kamako" });
+            foreach (Battle battle in newBattles)
+            {
+                _context.Battles.Add(battle);
+            }
+            _context.SaveChanges();
+        }
+
         #endregion
 
         #region Methods to load related data
@@ -354,12 +367,6 @@ namespace SamuraiApp.UI
         }
 
         #endregion
-
-        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-        /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
