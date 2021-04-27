@@ -37,6 +37,7 @@ namespace SamuraiApp.Data
                 .Property(bs => bs.DateJoined)
                 .HasDefaultValueSql("getdate()");
 
+            //To rename table: From horse to horses
             modelBuilder.Entity<Horse>().ToTable("Horses");
         }
     }
