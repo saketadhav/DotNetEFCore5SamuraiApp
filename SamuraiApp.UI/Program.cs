@@ -58,6 +58,17 @@ namespace SamuraiApp.UI
             //Filtering with related data : apply filters using conditions on related data, without loading related data
             FilteringWithRelatedData();
 
+            //Modifying / Updating related data
+            ModifyingRelatedDataWhenTracked();
+            ModifyingRelatedDataWhenNotTracked();
+
+            //Many to many relationships
+            AddingNewSamuraiToAnExistingBattle();
+            ReturnBattleWithSamurais();
+            ReturnAllBattlesWithSamurais();
+            AddAllSamuraisToAllBattles();
+            RemoveSamuraiFromBattleExplicitly();
+
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
@@ -368,6 +379,78 @@ namespace SamuraiApp.UI
 
         #endregion
 
+        #region Modifying related data
+
+        /// Modifying related data ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void ModifyingRelatedDataWhenTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            samurai.Quotes[0].Text = "Did you hear that?";
+            _context.SaveChanges();
+        }
+
+        private static void ModifyingRelatedDataWhenNotTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 2);
+            var quote = samurai.Quotes[0];
+            quote.Text += "Did you hear that again?";
+
+            using var newContext = new SamuraiContext();
+            //newContext.Qoutes.Update(quote);
+            //or
+            newContext.Entry(quote).State = EntityState.Modified;
+            newContext.SaveChanges();
+        }
+
+        #endregion
+
+        #region Many to many relationships
+
+        /// Many to many relationships ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void AddingNewSamuraiToAnExistingBattle()
+        {
+            var battle = _context.Battles.FirstOrDefault();
+            battle = battle == null ? new Battle() : battle;
+            battle.Samurais.Add(new Samurai { Name = "Takeda Shingen" });
+            _context.SaveChanges();
+        }
+
+        private static void ReturnBattleWithSamurais()
+        {
+            var battle = _context.Battles.Include(b => b.Samurais).FirstOrDefault();
+        }
+
+        private static void ReturnAllBattlesWithSamurais()
+        {
+            var battle = _context.Battles.Include(b => b.Samurais).ToList();
+        }
+
+        private static void AddAllSamuraisToAllBattles()
+        {
+            //To avoid sql exception of violation of foreign key, clear data from BattleSamurai if any
+
+            var allbattles = _context.Battles.ToList();
+            var allsamurais = _context.Samurais.ToList();
+            foreach (var battle in allbattles)
+            {
+                battle.Samurais.AddRange(allsamurais);
+            }
+            _context.SaveChanges();
+        }
+
+        private static void RemoveSamuraiFromBattleExplicitly()
+        {
+            var b_s = _context.Set<BattleSamurai>().SingleOrDefault(bs => bs.BattleId == 1 && bs.SamuraiId == 6);
+            if (b_s != null)
+            {
+                _context.Remove(b_s);
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
 
         /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
