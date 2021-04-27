@@ -24,6 +24,8 @@ namespace SamuraiApp.UI
 
             _context.Database.EnsureCreated();
 
+            #region Simple / Basic queries
+
             //Simple Queries
             GetSamurais("Before Add:");
             AddSamuraisByName("Shimada", "Okamoto", "Kikuchio", "Hayashida");
@@ -40,6 +42,11 @@ namespace SamuraiApp.UI
 
             //Avoid / Disable tracking mechanism
             GetResultsYetAvoidTracking();
+            #endregion
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            #region One to Many relationships
 
             //Adding related data
             InsertNewSamuraiWithAQuote();
@@ -61,13 +68,31 @@ namespace SamuraiApp.UI
             //Modifying / Updating related data
             ModifyingRelatedDataWhenTracked();
             ModifyingRelatedDataWhenNotTracked();
+            #endregion
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            #region Many to many relationships
 
-            //Many to many relationships
             AddingNewSamuraiToAnExistingBattle();
             ReturnBattleWithSamurais();
             ReturnAllBattlesWithSamurais();
             AddAllSamuraisToAllBattles();
             RemoveSamuraiFromBattleExplicitly();
+
+            #endregion
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            #region One to one relationships
+
+            AddNewSamuraiWithHorse();
+            AddNewHorseToSamuraiUsingId();
+            AddNewHorseToSamuraiObject();
+            GetSamuraiWithHorse();
+            GetHorsesWithSamurai();
+
+            #endregion
 
             Console.WriteLine("Press any key...");
             Console.ReadKey();
@@ -449,6 +474,52 @@ namespace SamuraiApp.UI
                 _context.SaveChanges();
             }
         }
+
+        #endregion
+
+        #region One to One relationships
+
+        /// One to One relationships ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void AddNewSamuraiWithHorse()
+        {
+            var samurai = new Samurai { Name = "Jina Ujichika" };
+            samurai.Horse = new Horse { Name = "Silver" };
+            _context.Samurais.Add(samurai);
+            _context.SaveChanges();
+        }
+
+        private static void AddNewHorseToSamuraiUsingId()
+        {
+            var horse = new Horse { Name = "Scout", SamuraiId = 6 };
+            _context.Add(horse);
+            _context.SaveChanges();
+        }
+
+        private static void AddNewHorseToSamuraiObject()
+        {
+            var samurai = _context.Samurais.Find(7);
+            samurai.Horse = new Horse { Name = "Black Beauty" };
+            _context.SaveChanges();
+        }
+
+        private static void GetSamuraiWithHorse()
+        {
+            var samurais = _context.Samurais.Include(s => s.Horse).ToList();
+        }
+
+        private static void GetHorsesWithSamurai()
+        {
+            var horseOnly = _context.Set<Horse>().Find(2);
+
+            var horseWithSamurai = _context.Samurais.Include(s => s.Horse).FirstOrDefault(s => s.Horse.Id == 3);
+
+            var horseSamuraiPairs = _context.Samurais
+                                    .Where(s => s.Horse != null)
+                                    .Select(s => new { Horse = s.Horse, Samurai = s })
+                                    .ToList();
+        }
+
 
         #endregion
 
