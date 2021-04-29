@@ -46,3 +46,15 @@ This is a visual studio extension which runs on DGML editor
 Visual Studio -> Extensions -> Manage Extensions.
 Search 'EF Core Power Tools' and click download.
 Then, right click on SamuraiApp.Data project -> EF Core Power Tools -> Add DbContext Model Diagram
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+To create sql functions / views using ef core:
+
+add-migration createViewAndSqlFunctionWithEfcore	//This is empth migration, without any changes in dbcontext
+Go to createViewAndSqlFunctionWithEfcore.cs.
+Add raw sql in Up() for creating, and Down() for dropping/deleting functions and views.
+Save and update-database.
+You can see the functions and views created in the database.
+(SamuraiAppData -> Views -> dbo.SamuraiBattleStats)
+(SamuraiAppData -> Programmability -> Functions -> Scalar-valued Functions -> dbo.EarliestBattleFoughtBySamurai)
