@@ -111,6 +111,16 @@ namespace SamuraiApp.UI
             QueryUsingStoredProcedure();
             #endregion
 
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            #region Non-Query Raw SQL commands
+
+            ExecuteSomeRawSQL();
+
+            #endregion
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
@@ -585,6 +595,23 @@ namespace SamuraiApp.UI
             var samuraisFromInterpolatedStorProc = _context.Samurais.FromSqlInterpolated($"EXEC dbo.SamuraisWhoSaidAWord {text}").ToList();
         }
 
+
+        #endregion
+
+        #region Non-Query Raw SQL commands
+        /// Non-Query Raw SQL commands ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //.Database accesses the db configured for the dbcontect instance
+        //Can be executed with : .ExecuteSQLRaw() or .ExecuteSQLInterpolated
+        //Returns only the number of rows affected by the command / stored proc, cannot return data
+        public static void ExecuteSomeRawSQL()
+        {
+            var samuraiId = 2;
+
+            var affectedRows = _context.Database.ExecuteSqlRaw("EXEC DeleteQuotesForSamurai {0}", samuraiId);
+            
+            affectedRows = _context.Database.ExecuteSqlInterpolated($"EXEC DeleteQuotesForSamurai {samuraiId}");
+        }
 
         #endregion
 
