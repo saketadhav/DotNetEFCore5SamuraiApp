@@ -1,6 +1,6 @@
-# EFCore-5 SamuraiApp
+# Dotnet Core net5.0 , EFCore 5, SamuraiApp
 
-*Notes
+> Notes
 
 We have directly added 
 Microsoft.EntityFrameworkCore.SqlServer
@@ -12,7 +12,9 @@ Had we installed just Microsoft.EntityFrameworkCore, we would have to look and a
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
-For migrations, Add following reference to the SamuraiApp.Data project : Microsoft.EntityFrameworkCore.Tools (For migration commands)
+**For Migrations** 
+
+Add following reference to the SamuraiApp.Data project : Microsoft.EntityFrameworkCore.Tools (For migration commands)
 Tools package will pull in Microsoft.EntityFrameworkCore.Design for you (For migration APIs)
 
 In VS, goto tools -> Nuget Package Manager -> Package Manager Console
@@ -22,7 +24,7 @@ get-help entityframework
 
 get-migration                                      // used to get a list of all the migrations with respective status
 
-Add-Migrations & Update-database are most commonly used.
+                                                    //Add-Migrations & Update-database are most commonly used.
 
 add-migration init_migration_1                     //init_migration_1 is name of migration, you can put whatever you want
       
@@ -37,7 +39,9 @@ scaffold-dbcontext -provider Microsoft.EntityFrameworkCore.SqlServer -connection
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
-To visualize the the models and relationships created by entity framework, use followinf tool :-
+**To visualize the the models and relationships created by entity framework**
+
+Use following tool :-
 
 EF Core Power Tools
 
@@ -51,7 +55,7 @@ Then, right click on SamuraiApp.Data project -> EF Core Power Tools -> Add DbCon
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
-To create sql functions / views using ef core:
+**To create sql functions / views using ef core:**
 
 add-migration createViewAndSqlFunctionWithEfcore	//This is empth migration, without any changes in dbcontext
 
@@ -65,6 +69,6 @@ You can see the functions and views created in the database.
 (SamuraiAppData -> Views -> dbo.SamuraiBattleStats)
 (SamuraiAppData -> Programmability -> Functions -> Scalar-valued Functions -> dbo.EarliestBattleFoughtBySamurai)
 
-Note: Same process for stored procedures as well.
+_Note: Same process for stored procedures as well._
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
