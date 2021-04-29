@@ -37,7 +37,7 @@ namespace SamuraiApp.Data.Migrations
 
                     b.HasIndex("SamuraiId");
 
-                    b.ToTable("Qoutes");
+                    b.ToTable("Quotes");
                 });
 
             modelBuilder.Entity("SamuraiApp.Domain.Samurai", b =>

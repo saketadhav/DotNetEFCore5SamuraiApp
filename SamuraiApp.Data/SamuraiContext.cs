@@ -8,8 +8,9 @@ namespace SamuraiApp.Data
     public class SamuraiContext : DbContext
     {
         public DbSet<Samurai> Samurais { get; set; }
-        public DbSet<Quote> Qoutes { get; set; }
+        public DbSet<Quote> Quotes { get; set; }
         public DbSet<Battle> Battles { get; set; }
+        public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
         //This OnConfiguring methos is used here only for demo purpose. We shall inject this info from config file later on.
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -39,6 +40,10 @@ namespace SamuraiApp.Data
 
             //To rename table: From horse to horses
             modelBuilder.Entity<Horse>().ToTable("Horses");
+
+            //To tell ef core that entity has no key, and that's intentional
+            //ToView() ensures that ef core maps this SamuraiBattleStat entity to existing dbo.SamuraiBattleStats, and does not create new table with reference to dbset
+            modelBuilder.Entity<SamuraiBattleStat>().HasNoKey().ToView("SamuraiBattleStats");
         }
     }
 }

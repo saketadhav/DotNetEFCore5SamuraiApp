@@ -69,9 +69,9 @@ namespace SamuraiApp.UI
             ModifyingRelatedDataWhenTracked();
             ModifyingRelatedDataWhenNotTracked();
             #endregion
-            
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            
+
             #region Many to many relationships
 
             AddingNewSamuraiToAnExistingBattle();
@@ -92,6 +92,23 @@ namespace SamuraiApp.UI
             GetSamuraiWithHorse();
             GetHorsesWithSamurai();
 
+            #endregion
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            #region Views and Functions
+
+            QueryAViewFromDB();
+
+            #endregion
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            #region Raw SQL and Stored Procedures
+            /// Raw SQL and Stored Procedures ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            QueryUsingRawSQL();
+            QueryUsingRawSQLwithInterpolation();
+            QueryUsingStoredProcedure();
             #endregion
 
             Console.WriteLine("Press any key...");
@@ -284,7 +301,7 @@ namespace SamuraiApp.UI
         {
             var quote = new Quote { Text = "Thanks for the dinner.", SamuraiId = samuraiId };
             using var newContext = new SamuraiContext();
-            newContext.Qoutes.Add(quote);
+            newContext.Quotes.Add(quote);
             newContext.SaveChanges();
         }
 
@@ -422,7 +439,7 @@ namespace SamuraiApp.UI
             quote.Text += "Did you hear that again?";
 
             using var newContext = new SamuraiContext();
-            //newContext.Qoutes.Update(quote);
+            //newContext.Quotes.Update(quote);
             //or
             newContext.Entry(quote).State = EntityState.Modified;
             newContext.SaveChanges();
@@ -518,6 +535,54 @@ namespace SamuraiApp.UI
                                     .Where(s => s.Horse != null)
                                     .Select(s => new { Horse = s.Horse, Samurai = s })
                                     .ToList();
+        }
+
+
+        #endregion
+
+        #region Views and Functions
+        /// Views and Functions ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private static void QueryAViewFromDB()
+        {
+            //Querying a vies is same as that of querying a table
+
+            var stats = _context.SamuraiBattleStats.ToList();
+
+            var firstStat = _context.SamuraiBattleStats.FirstOrDefault();
+
+            var sampsonStat = _context.SamuraiBattleStats.FirstOrDefault(s => s.Name == "Sampson");
+
+            //As views and functions are keyless, entity framework will throw error runtime for dbset methods (no compiler errors)
+
+            //var stat = _context.SamuraiBattleStats.Find(2);       //This will throw error at runtime
+        }
+
+        #endregion
+
+        #region Raw SQL and Stored Procedures
+        /// Raw SQL and Stored Procedures ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //2 types: FromSQLRaw() and FromSQLInterpolated()
+        //RawSQL should select *, no column more or less than what we have in entity, else error
+        private static void QueryUsingRawSQL()
+        {
+            var samurais = _context.Samurais.FromSqlRaw("Select * from samurais").ToList();
+
+            var samuraisWithQuotes = _context.Samurais.FromSqlRaw("Select * from samurais").Include(s => s.Quotes).ToList();
+        }
+
+        private static void QueryUsingRawSQLwithInterpolation()
+        {
+            string name = "Sampson";
+            var samurais = _context.Samurais.FromSqlInterpolated($"Select * from samurais where Name = {name}").ToList();
+        }
+        private static void QueryUsingStoredProcedure()
+        {
+            string text = "dinner";
+
+            var samuraisFromRawSQLStorProc = _context.Samurais.FromSqlRaw("EXEC dbo.SamuraisWhoSaidAWord {0}", text).ToList();
+
+            var samuraisFromInterpolatedStorProc = _context.Samurais.FromSqlInterpolated($"EXEC dbo.SamuraisWhoSaidAWord {text}").ToList();
         }
 
 

@@ -20,7 +20,7 @@ namespace SamuraiApp.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Qoutes",
+                name: "Quotes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -30,9 +30,9 @@ namespace SamuraiApp.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Qoutes", x => x.Id);
+                    table.PrimaryKey("PK_Quotes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Qoutes_Samurais_SamuraiId",
+                        name: "FK_Quotes_Samurais_SamuraiId",
                         column: x => x.SamuraiId,
                         principalTable: "Samurais",
                         principalColumn: "Id",
@@ -40,15 +40,15 @@ namespace SamuraiApp.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Qoutes_SamuraiId",
-                table: "Qoutes",
+                name: "IX_Quotes_SamuraiId",
+                table: "Quotes",
                 column: "SamuraiId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Qoutes");
+                name: "Quotes");
 
             migrationBuilder.DropTable(
                 name: "Samurais");
