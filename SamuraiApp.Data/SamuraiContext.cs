@@ -19,7 +19,7 @@ namespace SamuraiApp.Data
                 //For logging
                 //.LogTo(Console.WriteLine);
                 .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-                //To Log sensitive data i.e. paramets, etc
+                //To Log sensitive data i.e. parameters, etc
                 .EnableSensitiveDataLogging();
         }
 
