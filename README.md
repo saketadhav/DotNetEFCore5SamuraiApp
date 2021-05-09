@@ -72,3 +72,14 @@ You can see the functions and views created in the database.
 _Note: Same process for stored procedures as well._
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+> Testing
+
+```
+ For normal app, we are using **SamuraiAppData** (check connection string in SamuraiContect.cs, OnConfiguring()).
+ For integration test, we are using **SamuraiTestData**.
+ This can be done just by changing the database name in connection string.
+ ```
+
+ For using InMemory database in out Data project, add nuget package - "Microsoft.EntityFrameworkCore.InMemory"
