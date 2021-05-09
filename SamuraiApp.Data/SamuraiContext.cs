@@ -7,6 +7,15 @@ namespace SamuraiApp.Data
 {
     public class SamuraiContext : DbContext
     {
+        
+        //Default constructor
+        public SamuraiContext()
+        { }
+
+        //Following constructor will help us to determine which provider (SQL server provider, InMemory provider) to use for dbcontext
+        public SamuraiContext(DbContextOptions opt) : base(opt)
+        { }
+
         public DbSet<Samurai> Samurais { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Battle> Battles { get; set; }
@@ -29,8 +38,12 @@ namespace SamuraiApp.Data
         //************************** For unit testing ***************************
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder
-                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiTestData");
+            //If IsConfigured (by passing in constructor) => it will use in mermory database
+            //If not Configured => it will use sql server will following connection string
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiTestData");
+            }
         }
 
         //EF core has already generated class BattleSamurai on it's own for many to many relationship.
