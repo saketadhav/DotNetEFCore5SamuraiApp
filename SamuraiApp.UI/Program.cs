@@ -121,6 +121,9 @@ namespace SamuraiApp.UI
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            //For testing business logic
+            AddSamuraisByNameForTest();
+
             Console.WriteLine("Press any key...");
             Console.ReadKey();
         }
@@ -616,5 +619,13 @@ namespace SamuraiApp.UI
         #endregion
 
         /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //For testing business logic
+        private static void AddSamuraisByNameForTest(params string[] names)
+        {
+            var _bizData = new BusinessDataLogic();
+            var newSamuraisCreatedCount = _bizData.AddSamuraisByName(names);
+        }
+
     }
 }
