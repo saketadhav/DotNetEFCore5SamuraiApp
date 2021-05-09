@@ -12,16 +12,25 @@ namespace SamuraiApp.Data
         public DbSet<Battle> Battles { get; set; }
         public DbSet<SamuraiBattleStat> SamuraiBattleStats { get; set; }
 
-        //This OnConfiguring methos is used here only for demo purpose. We shall inject this info from config file later on.
+        //This OnConfiguring method is used here only for demo purpose. We shall inject this info from config file later on.
+
+        ////************************** For normal app ***************************
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder
+        //        .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiAppData")
+        //        //For logging
+        //        //.LogTo(Console.WriteLine);
+        //        .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
+        //        //To Log sensitive data i.e. parameters, etc
+        //        .EnableSensitiveDataLogging();
+        //}
+
+        //************************** For unit testing ***************************
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiAppData")
-                //For logging
-                //.LogTo(Console.WriteLine);
-                .LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
-                //To Log sensitive data i.e. parameters, etc
-                .EnableSensitiveDataLogging();
+                .UseSqlServer("Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog=SamuraiTestData");
         }
 
         //EF core has already generated class BattleSamurai on it's own for many to many relationship.
